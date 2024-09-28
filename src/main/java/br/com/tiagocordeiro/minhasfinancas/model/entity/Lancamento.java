@@ -19,7 +19,7 @@ public class Lancamento {
     @Column(name = "mes")
     private Integer mes;
 
-    @Column(name = "mes")
+    @Column(name = "ano")
     private Integer ano;
 
     @ManyToOne
@@ -40,6 +40,21 @@ public class Lancamento {
     @Column(name = "status")
     @Enumerated(value = EnumType.STRING)
     private StatusLancamento status;
+
+    public Lancamento() {
+
+    }
+
+    public Lancamento(Long id, Integer mes, Integer ano, Usuario usuario, BigDecimal valor, LocalDate dataCadastro, TipoLancamento tipo, StatusLancamento status) {
+        this.id = id;
+        this.mes = mes;
+        this.ano = ano;
+        this.usuario = usuario;
+        this.valor = valor;
+        this.dataCadastro = dataCadastro;
+        this.tipo = tipo;
+        this.status = status;
+    }
 
     public Long getId() {
         return id;
