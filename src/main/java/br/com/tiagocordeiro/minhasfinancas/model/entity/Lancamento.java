@@ -19,7 +19,7 @@ public class Lancamento {
     @Column(name = "mes")
     private Integer mes;
 
-    @Column(name = "mes")
+    @Column(name = "ano")
     private Integer ano;
 
     @ManyToOne
