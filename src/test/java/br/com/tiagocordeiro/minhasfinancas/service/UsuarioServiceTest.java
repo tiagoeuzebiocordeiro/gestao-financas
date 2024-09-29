@@ -1,5 +1,6 @@
 package br.com.tiagocordeiro.minhasfinancas.service;
 
+import br.com.tiagocordeiro.minhasfinancas.exception.ErroAutenticacaoException;
 import br.com.tiagocordeiro.minhasfinancas.exception.RegraNegocioException;
 import br.com.tiagocordeiro.minhasfinancas.model.entity.Usuario;
 import br.com.tiagocordeiro.minhasfinancas.model.repository.UsuarioRepository;
@@ -66,6 +67,33 @@ public class UsuarioServiceTest {
         Assertions.assertDoesNotThrow(() -> {
             org.assertj.core.api.Assertions.assertThat(result).isNotNull();
         });
+    }
+
+    @Test
+    public void deveLancarErroQuandoNaoEncontrarUsuarioCadastradoComEmailInformado() {
+        //cenario
+        Mockito.when(usuarioRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.empty());
+
+        Throwable exception = org.assertj.core.api.Assertions.catchThrowable(() ->
+                usuarioService.autenticar("email@gmail.com", "123"));
+
+        Assertions.assertEquals(ErroAutenticacaoException.class, exception.getClass());
+        Assertions.assertEquals("Usuário não encontrado para o e-mail informado.", exception.getMessage());
+    }
+
+    @Test
+    public void deveLancarErroQuandoSenhaNaoBater() {
+        //cenario
+        String senha = "T123";
+        String email = "tiago@mail.com";
+        Usuario usuario = new Usuario(null, "Tiago", email, senha);
+        Mockito.when(usuarioRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(usuario));
+
+        //acao e verificacao
+        Throwable exception = org.assertj.core.api.Assertions.catchThrowable(
+                () -> usuarioService.autenticar(email, "X"));
+        Assertions.assertEquals(ErroAutenticacaoException.class, exception.getClass());
+        Assertions.assertEquals("Senha inválida para o e-mail informado!", exception.getMessage());
     }
 
 }
