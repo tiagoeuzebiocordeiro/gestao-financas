@@ -16,6 +16,9 @@ public class Lancamento {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "descricao")
+    private String descricao;
+
     @Column(name = "mes")
     private Integer mes;
 
@@ -62,6 +65,14 @@ public class Lancamento {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
     public Integer getMes() {
