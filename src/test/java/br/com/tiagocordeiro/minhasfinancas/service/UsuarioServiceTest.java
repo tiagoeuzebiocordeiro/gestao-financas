@@ -13,6 +13,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Optional;
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 public class UsuarioServiceTest {
@@ -47,6 +49,22 @@ public class UsuarioServiceTest {
         //acao e verificacao
         Assertions.assertThrows(RegraNegocioException.class, () -> {
            usuarioService.validarEmail("qualquer@gmail.com");
+        });
+    }
+
+    @Test
+    public void deveAutenticarUsuarioComSucesso() {
+        // cenario
+        String email = "email@mail.com";
+        String senha = "123";
+        Usuario usuario = new Usuario(1L, "Jose", email, senha);
+        Mockito.when((usuarioRepository.findByEmail(email))).thenReturn(Optional.of(usuario));
+
+        //acao
+        Usuario result = usuarioService.autenticar(email, senha);
+
+        Assertions.assertDoesNotThrow(() -> {
+            org.assertj.core.api.Assertions.assertThat(result).isNotNull();
         });
     }
 
