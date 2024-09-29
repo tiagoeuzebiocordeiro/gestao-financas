@@ -3,27 +3,35 @@ package br.com.tiagocordeiro.minhasfinancas.service;
 import br.com.tiagocordeiro.minhasfinancas.exception.RegraNegocioException;
 import br.com.tiagocordeiro.minhasfinancas.model.entity.Usuario;
 import br.com.tiagocordeiro.minhasfinancas.model.repository.UsuarioRepository;
+import br.com.tiagocordeiro.minhasfinancas.service.impl.UsuarioServiceImpl;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.Mockito;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootTest
 @ExtendWith(SpringExtension.class)
+@ActiveProfiles("test")
 public class UsuarioServiceTest {
 
-    @Autowired
+    @MockBean
     UsuarioRepository usuarioRepository;
-
-    @Autowired
     UsuarioService usuarioService;
+
+    @BeforeEach
+    public void setUp() {
+        //usuarioRepository = Mockito.mock(UsuarioRepository.class); o @MockBean supre isso
+        usuarioService = new UsuarioServiceImpl(usuarioRepository);
+    }
 
     @Test
     public void deveValidarEmail() {
         // cenario
-        usuarioRepository.deleteAll();
+        // assim que ele retorna falso ele nao retorna true (exceção)
+        Mockito.when(usuarioRepository.existsByEmail(Mockito.anyString())).thenReturn(false);
 
         //acao e verificacao
         Assertions.assertDoesNotThrow(() -> {
@@ -34,8 +42,7 @@ public class UsuarioServiceTest {
     @Test
     public void deveLancarExcecaoDeEmailExistenteAoTentarSalvar() {
         //cenario
-        Usuario usuario = new Usuario(null, "qualquer", "qualquer@gmail.com", null);
-        usuarioRepository.save(usuario);
+        Mockito.when(usuarioRepository.existsByEmail(Mockito.anyString())).thenReturn(true);
 
         //acao e verificacao
         Assertions.assertThrows(RegraNegocioException.class, () -> {
