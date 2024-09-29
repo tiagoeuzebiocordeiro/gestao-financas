@@ -25,29 +25,6 @@ public class UsuarioRepositoryTest {
     @Autowired
     TestEntityManager entityManager;
 
-    @Test
-    public void deveVerificarExistenciaDeEmail() {
-        // cenário
-        Usuario usuario = new Usuario(null, "Tiago", "tiago@gmail.com", null);
-        entityManager.persist(usuario);
-        // ação ou execução
-        boolean resultado = usuarioRepository.existsByEmail("tiago@gmail.com");
-        // verificação
-        Assertions.assertThat(resultado).isTrue();
-    }
-
-    @Test
-    public void deveRetornarFalsoQuandoVerificarNaoExistenciaDeEmail() {
-        // garantir que a base esteja limpa
-        // cenario
-        //usuarioRepository.deleteAll();
-
-        // ação
-        boolean resultado = usuarioRepository.existsByEmail("emailqualquer@gmail.com");
-
-        // verificação
-        Assertions.assertThat(resultado).isFalse();
-    }
 
     @Test
     public void devePersistirUmUsuarioNaBaseDeDados() {

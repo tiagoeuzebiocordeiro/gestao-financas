@@ -34,15 +34,16 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional
     public Usuario salvar(Usuario usuario) {
-        validarEmail(usuario.getEmail());
+        validarEmail(usuario);
         return usuarioRepository.save(usuario);
     }
 
-    @Override
-    public void validarEmail(String email) {
-        boolean existe = this.usuarioRepository.existsByEmail(email);
-        if (existe) {
-            throw new RegraNegocioException("Já existe um usuário cadastrado com este e-mail.");
+    public void validarEmail(Usuario usuario) {
+        Optional<Usuario> usuarioParaValidar = usuarioRepository.findByEmail(usuario.getEmail());
+        if (usuarioParaValidar.isPresent() && !usuarioParaValidar.get().equals(usuario.getId())) {
+            throw new RegraNegocioException("E-mail já existente no sistema");
         }
     }
+
+
 }

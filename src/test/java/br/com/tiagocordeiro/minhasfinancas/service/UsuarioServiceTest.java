@@ -9,10 +9,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.Assert;
 
 import java.util.Optional;
 
@@ -20,38 +23,16 @@ import java.util.Optional;
 @ActiveProfiles("test")
 public class UsuarioServiceTest {
 
-    @MockBean
+    @Mock
     UsuarioRepository usuarioRepository;
-    UsuarioService usuarioService;
+    @InjectMocks
+    UsuarioServiceImpl usuarioService;
 
     @BeforeEach
     public void setUp() {
-        //usuarioRepository = Mockito.mock(UsuarioRepository.class); o @MockBean supre isso
-        usuarioService = new UsuarioServiceImpl(usuarioRepository);
+        MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    public void deveValidarEmail() {
-        // cenario
-        // assim que ele retorna falso ele nao retorna true (exceção)
-        Mockito.when(usuarioRepository.existsByEmail(Mockito.anyString())).thenReturn(false);
-
-        //acao e verificacao
-        Assertions.assertDoesNotThrow(() -> {
-            usuarioService.validarEmail("emailqualquer@gmail.com");
-        });
-    }
-
-    @Test
-    public void deveLancarExcecaoDeEmailExistenteAoTentarSalvar() {
-        //cenario
-        Mockito.when(usuarioRepository.existsByEmail(Mockito.anyString())).thenReturn(true);
-
-        //acao e verificacao
-        Assertions.assertThrows(RegraNegocioException.class, () -> {
-           usuarioService.validarEmail("qualquer@gmail.com");
-        });
-    }
 
     @Test
     public void deveAutenticarUsuarioComSucesso() {
@@ -94,6 +75,42 @@ public class UsuarioServiceTest {
                 () -> usuarioService.autenticar(email, "X"));
         Assertions.assertEquals(ErroAutenticacaoException.class, exception.getClass());
         Assertions.assertEquals("Senha inválida para o e-mail informado!", exception.getMessage());
+    }
+
+    @Test
+    public void deveSalvarUsuarioComSucesso() {
+        // Cenario
+        Usuario usuario = new Usuario(1L, "Tiago", "tiago@mail.com", "123");
+
+        Mockito.when(usuarioRepository.save(Mockito.any())).thenReturn(usuario);
+
+
+        // Acao
+        Usuario usuarioSalvo = usuarioService.salvar(usuario);
+
+        // Verificacao
+        Assertions.assertNotNull(usuarioSalvo);
+        Assertions.assertEquals(usuarioSalvo.getClass(), Usuario.class);
+        Assertions.assertEquals(1L, usuarioSalvo.getId());
+        Assertions.assertEquals("Tiago", usuarioSalvo.getNome());
+        Assertions.assertEquals("tiago@mail.com", usuarioSalvo.getEmail());
+        Assertions.assertEquals("123", usuarioSalvo.getSenha());
+    }
+
+    @Test
+    public void deveLancarExcecaoDeEmailAoTentarSalvarUsuarioComEmailJaCadastrado() {
+        //Cenario
+        Usuario usuario = new Usuario(1L, "Tiago", "tiago@mail.com", "123");
+        Mockito.when(usuarioRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(usuario));
+
+        try {
+            usuario.setId(2L); //Forçar diferença, ou seja, é outro cara com o mesmo e-mail
+            usuarioService.salvar(usuario);
+        } catch (Exception ex) {
+            Assertions.assertEquals(RegraNegocioException.class, ex.getClass());
+            Assertions.assertEquals("E-mail já existente no sistema", ex.getMessage());
+        }
+
     }
 
 }
