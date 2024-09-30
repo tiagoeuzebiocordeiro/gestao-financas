@@ -38,6 +38,11 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
+    @Override
+    public Optional<Usuario> obterPorId(Long id) {
+        return usuarioRepository.findById(id);
+    }
+
     public void validarEmail(Usuario usuario) {
         Optional<Usuario> usuarioParaValidar = usuarioRepository.findByEmail(usuario.getEmail());
         if (usuarioParaValidar.isPresent() && !usuarioParaValidar.get().equals(usuario.getId())) {
