@@ -36,6 +36,10 @@ public class Lancamento {
     @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
     private LocalDate dataCadastro;
 
+    @Column(name = "data_alteracao")
+    @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
+    private LocalDate dataAlteracao;
+
     @Column(name = "tipo")
     @Enumerated(value = EnumType.STRING)
     private TipoLancamento tipo;
@@ -48,13 +52,16 @@ public class Lancamento {
 
     }
 
-    public Lancamento(Long id, Integer mes, Integer ano, Usuario usuario, BigDecimal valor, LocalDate dataCadastro, TipoLancamento tipo, StatusLancamento status) {
+    public Lancamento(Long id, String descricao, Integer mes, Integer ano, Usuario usuario, BigDecimal valor,
+                      LocalDate dataCadastro, LocalDate dataAlteracao, TipoLancamento tipo, StatusLancamento status) {
         this.id = id;
+        this.descricao = descricao;
         this.mes = mes;
         this.ano = ano;
         this.usuario = usuario;
         this.valor = valor;
         this.dataCadastro = dataCadastro;
+        this.dataAlteracao = dataAlteracao;
         this.tipo = tipo;
         this.status = status;
     }
@@ -115,6 +122,14 @@ public class Lancamento {
         this.dataCadastro = dataCadastro;
     }
 
+    public LocalDate getDataAlteracao() {
+        return dataAlteracao;
+    }
+
+    public void setDataAlteracao(LocalDate dataAlteracao) {
+        this.dataAlteracao = dataAlteracao;
+    }
+
     public TipoLancamento getTipo() {
         return tipo;
     }
@@ -157,4 +172,7 @@ public class Lancamento {
                 ", status=" + status +
                 '}';
     }
+
+
+
 }
